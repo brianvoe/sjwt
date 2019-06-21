@@ -2,7 +2,7 @@ package sjwt
 
 import (
 	"crypto/hmac"
-	"crypto/sha512"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -44,7 +44,7 @@ func New(claims interface{}, secret []byte) (string, error) {
 	)
 
 	// Create New hmac and write jwt string to it
-	mac := hmac.New(sha512.New, secret)
+	mac := hmac.New(sha256.New, secret)
 	mac.Write([]byte(jwtStr))
 
 	return fmt.Sprintf("%s.%s", jwtStr, base64.RawURLEncoding.EncodeToString(mac.Sum(nil))), nil
@@ -62,7 +62,7 @@ func Parse(tokenStr string, claims interface{}) (*Token, error) {
 		return nil, err
 	}
 
-	err = json.Unmarshal(headerByte, token.Header)
+	err = json.Unmarshal(headerByte, &token.Header)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func Parse(tokenStr string, claims interface{}) (*Token, error) {
 // Verify will take in the token string and secret and identify the signature matches
 func (t *Token) Verify(tokenStr string, secret []byte) bool {
 	token := strings.Split(tokenStr, ".")
-	mac := hmac.New(sha512.New, secret)
+	mac := hmac.New(sha256.New, secret)
 	mac.Write([]byte(token[0]))
 	return hmac.Equal([]byte(token[1]), mac.Sum(nil))
 

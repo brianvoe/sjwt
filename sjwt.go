@@ -9,82 +9,46 @@ import (
 	"strings"
 )
 
-type Token struct {
-	Header Header
-	Claims interface{}
-}
-
-type Header struct {
-	Type      string `json:"typ"`
-	Algorithm string `json:"alg"`
-}
-
-// New takes in claims and a secret
-func New(claims interface{}, secret []byte) (string, error) {
-	// Marshal Header
-	headerBytes, err := json.Marshal(Header{
-		Type:      "JWT",
-		Algorithm: "HS512",
-	})
-	if err != nil {
-		return "", err
-	}
-
-	// Marshal Claims
-	claimsBytes, err := json.Marshal(claims)
-	if err != nil {
-		return "", err
-	}
-
-	// Put together jwt string
+// Generate takes in claims and a secret and outputs jwt token
+func (c Claims) Generate(secret []byte) (string, error) {
+	// Encode header and claims
+	headerEnc, _ := json.Marshal(map[string]string{"typ": "JWT", "alg": "HS256"})
+	claimsEnc, _ := json.Marshal(c)
 	jwtStr := fmt.Sprintf(
 		"%s.%s",
-		base64.RawURLEncoding.EncodeToString(headerBytes),
-		base64.RawURLEncoding.EncodeToString(claimsBytes),
+		base64.RawURLEncoding.EncodeToString(headerEnc),
+		base64.RawURLEncoding.EncodeToString(claimsEnc),
 	)
 
-	// Create New hmac and write jwt string to it
+	// Sign with sha 256
 	mac := hmac.New(sha256.New, secret)
 	mac.Write([]byte(jwtStr))
 
 	return fmt.Sprintf("%s.%s", jwtStr, base64.RawURLEncoding.EncodeToString(mac.Sum(nil))), nil
-
 }
 
-// Parse will take in the token string grab the body and unmarshal into claims interface
-func Parse(tokenStr string, claims interface{}) (*Token, error) {
+// ParseClaims will take in the token string grab the body and unmarshal into claims interface
+func ParseClaims(tokenStr string) (Claims, error) {
 	tokenArray := strings.Split(tokenStr, ".")
-
-	token := Token{}
-
-	headerByte, err := base64.RawURLEncoding.DecodeString(tokenArray[0])
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(headerByte, &token.Header)
-	if err != nil {
-		return nil, err
-	}
 
 	claimsByte, err := base64.RawURLEncoding.DecodeString(tokenArray[1])
 	if err != nil {
 		return nil, err
 	}
 
-	err = json.Unmarshal(claimsByte, token.Claims)
+	var claims Claims
+	err = json.Unmarshal(claimsByte, claims)
 	if err != nil {
 		return nil, err
 	}
 
-	return &token, nil
+	return claims, nil
 }
 
 // Verify will take in the token string and secret and identify the signature matches
-func (t *Token) Verify(tokenStr string, secret []byte) bool {
+func Verify(tokenStr string, secret []byte) bool {
 	token := strings.Split(tokenStr, ".")
 	mac := hmac.New(sha256.New, secret)
-	mac.Write([]byte(token[0]))
-	return hmac.Equal([]byte(token[1]), mac.Sum(nil))
-
+	mac.Write([]byte(fmt.Sprintf("%s.%s", token[0], token[1])))
+	return hmac.Equal([]byte(token[2]), mac.Sum(nil))
 }

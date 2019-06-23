@@ -37,7 +37,7 @@ func ParseClaims(tokenStr string) (Claims, error) {
 	}
 
 	var claims Claims
-	err = json.Unmarshal(claimsByte, claims)
+	err = json.Unmarshal(claimsByte, &claims)
 	if err != nil {
 		return nil, err
 	}
@@ -50,5 +50,6 @@ func Verify(tokenStr string, secret []byte) bool {
 	token := strings.Split(tokenStr, ".")
 	mac := hmac.New(sha256.New, secret)
 	mac.Write([]byte(fmt.Sprintf("%s.%s", token[0], token[1])))
-	return hmac.Equal([]byte(token[2]), mac.Sum(nil))
+	sig, _ := base64.RawURLEncoding.DecodeString(token[2])
+	return hmac.Equal(sig, mac.Sum(nil))
 }

@@ -1,6 +1,9 @@
 package sjwt
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 // Claims is the main container for our body information
 type Claims map[string]interface{}
@@ -28,6 +31,29 @@ func (c Claims) ToStruct(struc interface{}) error {
 	err := json.Unmarshal(claimsBytes, struc)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// Validate checks expiration and not before times
+func (c Claims) Validate() error {
+	now := time.Now().Unix()
+
+	// Check if not before at is set and if current time hasnt started yet
+	if c.Has(NotBeforeAt) {
+		nbf := c.GetNotBeforeAt()
+		if now < nbf {
+			return ErrTokenNotYetValid
+		}
+	}
+
+	// Check if expiration at is set and if current time is passed
+	if c.Has(ExpiresAt) {
+		exp := c.GetExpiresAt()
+		if now >= exp {
+			return ErrTokenHasExpired
+		}
 	}
 
 	return nil

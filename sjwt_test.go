@@ -18,6 +18,14 @@ func TestGenerate(t *testing.T) {
 	}
 }
 
+func BenchmarkGenerate(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		claims := New()
+		claims.Add("hello", "world")
+		claims.Generate(secretKey)
+	}
+}
+
 func TestParseClaims(t *testing.T) {
 	claims := New()
 	claims.Add("hello", "world")

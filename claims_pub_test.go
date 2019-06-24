@@ -23,7 +23,7 @@ func TestClaims(t *testing.T) {
 	// Check normal get
 	temp := claims.Get("temp").(string)
 	if temp != "temp val" {
-		t.Error("getting temp recieved incorrect value")
+		t.Error("getting temp received incorrect value")
 	}
 
 	// Check deletion

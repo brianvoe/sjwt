@@ -8,24 +8,83 @@ import (
 func Example() {
 	// Add Claims
 	claims := New()
-	claims.Add("first_name", "billy")
-	claims.Add("last_name", "mister")
+	claims.Add("username", "billymister")
+	claims.Add("account_id", 8675309)
 
 	// Generate jwt
-	jwt, err := claims.Generate([]byte("secret_key_here"))
+	secretKey := []byte("secret_key_here")
+	jwt, err := claims.Generate(secretKey)
 	fmt.Println(jwt, err)
 }
 
 func Example_registeredClaims() {
+	// Add Claims
 	claims := New()
-	claims.SetTokenID()
-	claims.SetSubject("Subject Title")
-	claims.SetIssuer("Google")
-	claims.SetAudience([]string{"Google", "Facebook"})
+	claims.SetTokenID()                                  // UUID generated
+	claims.SetSubject("Subject Title")                   // Subject of the token
+	claims.SetIssuer("Google")                           // Issuer of the token
+	claims.SetAudience([]string{"Google", "Facebook"})   // Audience the toke is for
 	claims.SetIssuedAt(time.Now())                       // IssuedAt in time, value is set in unix
 	claims.SetNotBeforeAt(time.Now().Add(time.Hour * 1)) // Token valid in 1 hour
 	claims.SetExpiresAt(time.Now().Add(time.Hour * 24))  // Token expires in 24 hours
 
-	jwt, err := claims.Generate([]byte("secret_key_here"))
+	// Generate jwt
+	secretKey := []byte("secret_key_here")
+	jwt, err := claims.Generate(secretKey)
 	fmt.Println(jwt, err)
+}
+
+func Example_publicClaims() {
+	// Add Claims
+	claims := New()
+	claims.Add("username", "billymister")
+	claims.Add("account_id", 8675309)
+
+	// Generate jwt
+	secretKey := []byte("secret_key_here")
+	jwt, err := claims.Generate(secretKey)
+	fmt.Println(jwt, err)
+}
+
+func Example_structToClaims() {
+	type Info struct {
+		Name string `json:"name"`
+	}
+
+	// Marshal your struct into claims
+	info := Info{Name: "Billy Mister"}
+	claims, _ := ToClaims(info)
+
+	// Generate jwt
+	secretKey := []byte("secret_key_here")
+	jwt, _ := claims.Generate(secretKey)
+	fmt.Println(jwt)
+	// output: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQmlsbHkgTWlzdGVyIn0.2FYrpCNy1tg_4UvimpSrgAy-nT9snh-l4w9VLz71b6Y
+}
+
+func Example_claimsToStruct() {
+	type Info struct {
+		Name string `json:"name"`
+	}
+
+	// Parse jwt
+	jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQmlsbHkgTWlzdGVyIn0.2FYrpCNy1tg_4UvimpSrgAy-nT9snh-l4w9VLz71b6Y"
+	claims, _ := ParseClaims(jwt)
+
+	// Marshal your struct into claims
+	info := Info{}
+	claims.ToStruct(&info)
+
+	fmt.Println(claims.GetStr("name"))
+	// output: Billy Mister
+}
+
+func Example_verifySignature() {
+	secretKey := []byte("secret_key_here")
+	jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQmlsbHkgTWlzdGVyIn0.2FYrpCNy1tg_4UvimpSrgAy-nT9snh-l4w9VLz71b6Y"
+
+	// Pass jwt and secret key to verify
+	verified := Verify(jwt, secretKey)
+	fmt.Println(verified)
+	// output: true
 }

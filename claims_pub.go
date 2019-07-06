@@ -1,7 +1,6 @@
 package sjwt
 
 import (
-	"encoding/json"
 	"fmt"
 	"strconv"
 )
@@ -54,7 +53,6 @@ func (c Claims) GetInt(name string) int {
 	if _, ok := c[name]; ok {
 		switch val := c[name].(type) {
 		case float32:
-			return int(val)
 		case float64:
 			return int(val)
 		case string:
@@ -74,13 +72,11 @@ func (c Claims) GetInt(name string) int {
 func (c Claims) GetFloat(name string) float64 {
 	if _, ok := c[name]; ok {
 		switch val := c[name].(type) {
+		case float32:
 		case float64:
 			return float64(val)
 		case string:
 			v, _ := strconv.ParseFloat(val, 64)
-			return v
-		case json.Number:
-			v, _ := val.Float64()
 			return v
 		}
 	}

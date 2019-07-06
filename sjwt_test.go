@@ -9,10 +9,7 @@ var secretKey = []byte("whats up yall")
 func TestGenerate(t *testing.T) {
 	claims := New()
 	claims.Add("hello", "world")
-	jwt, err := claims.Generate(secretKey)
-	if err != nil {
-		t.Error(err)
-	}
+	jwt := claims.Generate(secretKey)
 	if jwt == "" {
 		t.Error("jwt is empty")
 	}
@@ -26,12 +23,12 @@ func BenchmarkGenerate(b *testing.B) {
 	}
 }
 
-func TestParseClaims(t *testing.T) {
+func TestParse(t *testing.T) {
 	claims := New()
 	claims.Add("hello", "world")
-	jwt, _ := claims.Generate(secretKey)
+	jwt := claims.Generate(secretKey)
 
-	newClaims, err := ParseClaims(jwt)
+	newClaims, err := Parse(jwt)
 	if err != nil {
 		t.Error("error parsing claims")
 	}
@@ -40,10 +37,24 @@ func TestParseClaims(t *testing.T) {
 	}
 }
 
+func TestParseEmpty(t *testing.T) {
+	_, err := Parse("")
+	if err != ErrTokenInvalid {
+		t.Error("error should have failed to parse empty jwt")
+	}
+}
+
+func TestParseDecodeError(t *testing.T) {
+	_, err := Parse("..")
+	if err == nil {
+		t.Error("error should have failed to parse empty jwt")
+	}
+}
+
 func TestVerify(t *testing.T) {
 	claims := New()
 	claims.Add("hello", "world")
-	jwt, _ := claims.Generate(secretKey)
+	jwt := claims.Generate(secretKey)
 
 	verified := Verify(jwt, secretKey)
 	if !verified {
@@ -51,6 +62,17 @@ func TestVerify(t *testing.T) {
 	}
 
 	verified = Verify(jwt, []byte("Bad secret"))
+	if verified {
+		t.Error("verification should have failed")
+	}
+}
+
+func TestVerifyError(t *testing.T) {
+	jwt := "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9." +
+		"eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ." +
+		"uk1qJnGuGHHGFw6fXpVILrdo52JqyD3EzvW3_DxhgZPAqU-OKzzPy7xdRNeQRba5CI6VGmlo6DBYqRCteiiOTw"
+
+	verified := Verify(jwt, secretKey)
 	if verified {
 		t.Error("verification should have failed")
 	}

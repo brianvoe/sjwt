@@ -89,8 +89,8 @@ func (c Claims) DeleteIssuedAt() { delete(c, IssuedAt) }
 
 // GetIssuedAt will get the issued at timestamp set on the Claims
 func (c Claims) GetIssuedAt() int64 {
-	if val, ok := c[IssuedAt]; ok {
-		return val.(int64)
+	if _, ok := c[IssuedAt]; ok {
+		return int64(c.GetInt(IssuedAt))
 	}
 	return 0
 }
@@ -103,8 +103,8 @@ func (c Claims) DeleteExpiresAt() { delete(c, ExpiresAt) }
 
 // GetExpiresAt will get the expires at timestamp set on the Claims
 func (c Claims) GetExpiresAt() int64 {
-	if val, ok := c[ExpiresAt]; ok {
-		return val.(int64)
+	if _, ok := c[ExpiresAt]; ok {
+		return int64(c.GetInt(ExpiresAt))
 	}
 	return 0
 }
@@ -117,8 +117,8 @@ func (c Claims) DeleteNotBeforeAt() { delete(c, NotBeforeAt) }
 
 // GetNotBeforeAt will get the not before at timestamp set on the Claims
 func (c Claims) GetNotBeforeAt() int64 {
-	if val, ok := c[NotBeforeAt]; ok {
-		return val.(int64)
+	if _, ok := c[NotBeforeAt]; ok {
+		return int64(c.GetInt(NotBeforeAt))
 	}
 	return 0
 }

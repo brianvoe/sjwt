@@ -41,12 +41,22 @@ func TestToStruct(t *testing.T) {
 }
 
 func TestValidate(t *testing.T) {
+	// Validate just the claim
 	claims := New()
+	claims.SetIssuedAt(time.Now())
 	claims.SetNotBeforeAt(time.Now())
 	claims.SetExpiresAt(time.Now().Add(time.Hour))
 	err := claims.Validate()
 	if err != nil {
 		t.Error("Validate was not successful when it should be")
+	}
+
+	// Validate on parsed claims
+	token := claims.Generate([]byte(secretKey))
+	parsedClaims, err := Parse(token)
+	err = parsedClaims.Validate()
+	if err != nil {
+		t.Error("Validate was not successful on parsed claims when it should be")
 	}
 }
 

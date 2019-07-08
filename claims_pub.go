@@ -52,15 +52,32 @@ func (c Claims) GetStr(name string) string {
 func (c Claims) GetInt(name string) int {
 	if _, ok := c[name]; ok {
 		switch val := c[name].(type) {
-		case float32:
-		case float64:
-			return int(val)
 		case string:
 			v, _ := strconv.ParseInt(val, 10, 64)
 			return int(v)
+		case float32:
+			return int(val)
+		case float64:
+			return int(val)
 		case uint:
 			return int(val)
+		case uint8:
+			return int(val)
+		case uint16:
+			return int(val)
+		case uint32:
+			return int(val)
+		case uint64:
+			return int(val)
 		case int:
+			return int(val)
+		case int8:
+			return int(val)
+		case int16:
+			return int(val)
+		case int32:
+			return int(val)
+		case int64:
 			return int(val)
 		}
 	}
@@ -73,6 +90,7 @@ func (c Claims) GetFloat(name string) float64 {
 	if _, ok := c[name]; ok {
 		switch val := c[name].(type) {
 		case float32:
+			return float64(val)
 		case float64:
 			return float64(val)
 		case string:

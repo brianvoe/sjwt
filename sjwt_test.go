@@ -32,8 +32,13 @@ func TestParse(t *testing.T) {
 	if err != nil {
 		t.Error("error parsing claims")
 	}
-	if !newClaims.Has("hello") || newClaims.GetStr("hello") != "world" {
+	if !newClaims.Has("hello") {
 		t.Error("error getting claims hello from parsed claims")
+	}
+
+	hello, _ := newClaims.GetStr("hello")
+	if hello != "world" {
+		t.Error("error hello does not equal world")
 	}
 }
 

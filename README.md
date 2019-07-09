@@ -24,7 +24,7 @@ jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI
 claims, _ := Parse(jwt)
 
 // Get claims
-name := claims.GetStr("name") // John Doe
+name, err := claims.GetStr("name") // John Doe
 ```
 
 ## Example usage of registered claims

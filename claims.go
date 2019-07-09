@@ -42,7 +42,7 @@ func (c Claims) Validate() error {
 
 	// Check if not before at is set and if current time hasnt started yet
 	if c.Has(NotBeforeAt) {
-		nbf := c.GetNotBeforeAt()
+		nbf, _ := c.GetNotBeforeAt()
 		if now < nbf {
 			return ErrTokenNotYetValid
 		}
@@ -50,7 +50,7 @@ func (c Claims) Validate() error {
 
 	// Check if expiration at is set and if current time is passed
 	if c.Has(ExpiresAt) {
-		exp := c.GetExpiresAt()
+		exp, _ := c.GetExpiresAt()
 		if now >= exp {
 			return ErrTokenHasExpired
 		}

@@ -15,89 +15,105 @@ func (c Claims) Del(name string) { delete(c, name) }
 func (c Claims) Has(name string) bool { _, ok := c[name]; return ok }
 
 // Get gets claim value
-func (c Claims) Get(name string) interface{} { return c[name] }
+func (c Claims) Get(name string) (interface{}, error) {
+	if !c.Has(name) {
+		return nil, ErrNotFound
+	}
+
+	return c[name], nil
+}
 
 // GetBool will get the boolean value on the Claims
-func (c Claims) GetBool(name string) bool {
-	if _, ok := c[name]; ok {
-		switch val := c[name].(type) {
-		case string:
-			v, _ := strconv.ParseBool(val)
-			return v
-		case bool:
-			return val
-		}
+func (c Claims) GetBool(name string) (bool, error) {
+	if !c.Has(name) {
+		return false, ErrNotFound
 	}
-	return false
+
+	// Type check
+	switch val := c[name].(type) {
+	case string:
+		v, _ := strconv.ParseBool(val)
+		return v, nil
+	case bool:
+		return val, nil
+	}
+
+	return false, ErrClaimValueInvalid
 }
 
 // GetStr will get the string value on the Claims
-func (c Claims) GetStr(name string) string {
-	if _, ok := c[name]; ok {
-		switch val := c[name].(type) {
-		case string:
-			return val
-		case float32:
-			return strconv.FormatFloat(float64(val), 'f', -1, 32)
-		case float64:
-			return strconv.FormatFloat(val, 'f', -1, 64)
-		default:
-			return fmt.Sprintf("%v", val)
-		}
+func (c Claims) GetStr(name string) (string, error) {
+	if !c.Has(name) {
+		return "", ErrNotFound
 	}
-	return ""
+
+	switch val := c[name].(type) {
+	case float32:
+		return strconv.FormatFloat(float64(val), 'f', -1, 32), nil
+	case float64:
+		return strconv.FormatFloat(val, 'f', -1, 64), nil
+	}
+
+	return fmt.Sprintf("%v", c[name]), nil
 }
 
 // GetInt will get the int value on the Claims
-func (c Claims) GetInt(name string) int {
-	if _, ok := c[name]; ok {
-		switch val := c[name].(type) {
-		case string:
-			v, _ := strconv.ParseInt(val, 10, 64)
-			return int(v)
-		case float32:
-			return int(val)
-		case float64:
-			return int(val)
-		case uint:
-			return int(val)
-		case uint8:
-			return int(val)
-		case uint16:
-			return int(val)
-		case uint32:
-			return int(val)
-		case uint64:
-			return int(val)
-		case int:
-			return int(val)
-		case int8:
-			return int(val)
-		case int16:
-			return int(val)
-		case int32:
-			return int(val)
-		case int64:
-			return int(val)
-		}
+func (c Claims) GetInt(name string) (int, error) {
+	if !c.Has(name) {
+		return 0, ErrNotFound
 	}
 
-	return 0
+	switch val := c[name].(type) {
+	case string:
+		v, err := strconv.ParseInt(val, 10, 64)
+		if err != nil {
+			return 0, ErrClaimValueInvalid
+		}
+		return int(v), nil
+	case float32:
+		return int(val), nil
+	case float64:
+		return int(val), nil
+	case uint:
+		return int(val), nil
+	case uint8:
+		return int(val), nil
+	case uint16:
+		return int(val), nil
+	case uint32:
+		return int(val), nil
+	case uint64:
+		return int(val), nil
+	case int:
+		return int(val), nil
+	case int8:
+		return int(val), nil
+	case int16:
+		return int(val), nil
+	case int32:
+		return int(val), nil
+	case int64:
+		return int(val), nil
+	}
+
+	return 0, ErrClaimValueInvalid
 }
 
 // GetFloat will get the float value on the Claims
-func (c Claims) GetFloat(name string) float64 {
-	if _, ok := c[name]; ok {
-		switch val := c[name].(type) {
-		case float32:
-			return float64(val)
-		case float64:
-			return float64(val)
-		case string:
-			v, _ := strconv.ParseFloat(val, 64)
-			return v
-		}
+func (c Claims) GetFloat(name string) (float64, error) {
+	if !c.Has(name) {
+		return 0, ErrNotFound
 	}
 
-	return 0
+	switch val := c[name].(type) {
+	case float32:
+		return float64(val), nil
+	case float64:
+		return float64(val), nil
+	case string:
+		v, _ := strconv.ParseFloat(val, 64)
+		return v, nil
+	}
+
+	return 0, ErrClaimValueInvalid
 }

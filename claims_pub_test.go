@@ -24,8 +24,8 @@ func TestClaims(t *testing.T) {
 	}
 
 	// Check normal get
-	temp := claims.Get("temp").(string)
-	if temp != "temp val" {
+	temp, _ := claims.Get("temp")
+	if temp.(string) != "temp val" {
 		t.Error("getting temp received incorrect value")
 	}
 
@@ -36,57 +36,57 @@ func TestClaims(t *testing.T) {
 	}
 
 	// Boolean
-	bool := claims.GetBool("bool")
+	bool, _ := claims.GetBool("bool")
 	if bool != true {
 		t.Error("bool claim is incorrect, got: ", bool)
 	}
-	stringbool := claims.GetBool("stringbool")
+	stringbool, _ := claims.GetBool("stringbool")
 	if stringbool != true {
 		t.Error("stringbool claim is incorrect, got: ", stringbool)
 	}
 
 	// String
-	string := claims.GetStr("string")
+	string, _ := claims.GetStr("string")
 	if string != "hello world" {
 		t.Error("string claim is incorrect, got: ", string)
 	}
-	intstring := claims.GetStr("intstring")
+	intstring, _ := claims.GetStr("intstring")
 	if intstring != "8675309" {
 		t.Error("intstring claim is incorrect, got: ", intstring)
 	}
-	float32string := claims.GetStr("float32string")
+	float32string, _ := claims.GetStr("float32string")
 	if float32string != "86753.09" {
 		t.Error("float32string claim is incorrect, got: ", float32string)
 	}
-	float64string := claims.GetStr("float64string")
+	float64string, _ := claims.GetStr("float64string")
 	if float64string != "86753.09" {
 		t.Error("float64string claim is incorrect, got: ", float64string)
 	}
 
 	// Integer
-	int := claims.GetInt("int")
+	int, _ := claims.GetInt("int")
 	if int != 8675309 {
 		t.Error("int claim is incorrect, got: ", int)
 	}
-	uintint := claims.GetInt("uintint")
+	uintint, _ := claims.GetInt("uintint")
 	if uintint != 8675309 {
 		t.Error("uintint claim is incorrect, got: ", uintint)
 	}
-	floatint := claims.GetInt("floatint")
+	floatint, _ := claims.GetInt("floatint")
 	if floatint != 86753 {
 		t.Error("floatint claim is incorrect, got: ", floatint)
 	}
-	stringint := claims.GetInt("stringint")
+	stringint, _ := claims.GetInt("stringint")
 	if stringint != 8675309 {
 		t.Error("stringint claim is incorrect, got: ", stringint)
 	}
 
 	// Float
-	float := claims.GetFloat("float")
+	float, _ := claims.GetFloat("float")
 	if float != 8675309.69 {
 		t.Error("float claim is incorrect, got: ", float)
 	}
-	stringfloat := claims.GetFloat("stringfloat")
+	stringfloat, _ := claims.GetFloat("stringfloat")
 	if stringfloat != 8675309.69 {
 		t.Error("stringfloat claim is incorrect, got: ", stringfloat)
 	}

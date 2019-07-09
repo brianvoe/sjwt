@@ -32,11 +32,17 @@ func (c Claims) SetTokenID() { c[TokenID] = UUID() }
 func (c Claims) DeleteTokenID() { delete(c, TokenID) }
 
 // GetTokenID will get the id set on the Claims
-func (c Claims) GetTokenID() string {
-	if val, ok := c[TokenID]; ok {
-		return val.(string)
+func (c Claims) GetTokenID() (string, error) {
+	if !c.Has(TokenID) {
+		return "", ErrNotFound
 	}
-	return ""
+
+	switch val := c[TokenID].(type) {
+	case string:
+		return val, nil
+	}
+
+	return "", ErrClaimValueInvalid
 }
 
 // SetIssuer will set a string value for the issuer
@@ -46,11 +52,17 @@ func (c Claims) SetIssuer(issuer string) { c[Issuer] = issuer }
 func (c Claims) DeleteIssuer() { delete(c, Issuer) }
 
 // GetIssuer will get the issuer set on the Claims
-func (c Claims) GetIssuer() string {
-	if val, ok := c[Issuer]; ok {
-		return val.(string)
+func (c Claims) GetIssuer() (string, error) {
+	if !c.Has(Issuer) {
+		return "", ErrNotFound
 	}
-	return ""
+
+	switch val := c[Issuer].(type) {
+	case string:
+		return val, nil
+	}
+
+	return "", ErrClaimValueInvalid
 }
 
 // SetAudience will set a string value for the audience
@@ -60,11 +72,17 @@ func (c Claims) SetAudience(audience []string) { c[Audience] = audience }
 func (c Claims) DeleteAudience() { delete(c, Audience) }
 
 // GetAudience will get the audience set on the Claims
-func (c Claims) GetAudience() []string {
-	if val, ok := c[Audience]; ok {
-		return val.([]string)
+func (c Claims) GetAudience() ([]string, error) {
+	if !c.Has(Audience) {
+		return []string{}, ErrNotFound
 	}
-	return []string{}
+
+	switch val := c[Audience].(type) {
+	case []string:
+		return val, nil
+	}
+
+	return []string{}, ErrClaimValueInvalid
 }
 
 // SetSubject will set a subject value
@@ -74,11 +92,17 @@ func (c Claims) SetSubject(subject string) { c[Subject] = subject }
 func (c Claims) DeleteSubject() { delete(c, Subject) }
 
 // GetSubject will get the subject set on the Claims
-func (c Claims) GetSubject() string {
-	if val, ok := c[Subject]; ok {
-		return val.(string)
+func (c Claims) GetSubject() (string, error) {
+	if !c.Has(Subject) {
+		return "", ErrNotFound
 	}
-	return ""
+
+	switch val := c[Subject].(type) {
+	case string:
+		return val, nil
+	}
+
+	return "", ErrClaimValueInvalid
 }
 
 // SetIssuedAt will set an issued at timestamp in nanoseconds
@@ -88,11 +112,17 @@ func (c Claims) SetIssuedAt(issuedAt time.Time) { c[IssuedAt] = issuedAt.Unix() 
 func (c Claims) DeleteIssuedAt() { delete(c, IssuedAt) }
 
 // GetIssuedAt will get the issued at timestamp set on the Claims
-func (c Claims) GetIssuedAt() int64 {
-	if _, ok := c[IssuedAt]; ok {
-		return int64(c.GetInt(IssuedAt))
+func (c Claims) GetIssuedAt() (int64, error) {
+	if !c.Has(IssuedAt) {
+		return 0, ErrNotFound
 	}
-	return 0
+
+	issuedAt, err := c.GetInt(IssuedAt)
+	if err != nil {
+		return 0, ErrClaimValueInvalid
+	}
+
+	return int64(issuedAt), nil
 }
 
 // SetExpiresAt will set an expires at timestamp in nanoseconds
@@ -102,11 +132,17 @@ func (c Claims) SetExpiresAt(expiresAt time.Time) { c[ExpiresAt] = expiresAt.Uni
 func (c Claims) DeleteExpiresAt() { delete(c, ExpiresAt) }
 
 // GetExpiresAt will get the expires at timestamp set on the Claims
-func (c Claims) GetExpiresAt() int64 {
-	if _, ok := c[ExpiresAt]; ok {
-		return int64(c.GetInt(ExpiresAt))
+func (c Claims) GetExpiresAt() (int64, error) {
+	if !c.Has(ExpiresAt) {
+		return 0, ErrNotFound
 	}
-	return 0
+
+	expiresAt, err := c.GetInt(ExpiresAt)
+	if err != nil {
+		return 0, ErrClaimValueInvalid
+	}
+
+	return int64(expiresAt), nil
 }
 
 // SetNotBeforeAt will set an not before at timestamp in nanoseconds
@@ -116,9 +152,15 @@ func (c Claims) SetNotBeforeAt(notbeforeAt time.Time) { c[NotBeforeAt] = notbefo
 func (c Claims) DeleteNotBeforeAt() { delete(c, NotBeforeAt) }
 
 // GetNotBeforeAt will get the not before at timestamp set on the Claims
-func (c Claims) GetNotBeforeAt() int64 {
-	if _, ok := c[NotBeforeAt]; ok {
-		return int64(c.GetInt(NotBeforeAt))
+func (c Claims) GetNotBeforeAt() (int64, error) {
+	if !c.Has(NotBeforeAt) {
+		return 0, ErrNotFound
 	}
-	return 0
+
+	notBeforeAt, err := c.GetInt(NotBeforeAt)
+	if err != nil {
+		return 0, ErrClaimValueInvalid
+	}
+
+	return int64(notBeforeAt), nil
 }

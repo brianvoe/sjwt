@@ -23,7 +23,7 @@ func Example_parse() {
 	claims, _ := Parse(jwt)
 
 	// Get claims
-	name := claims.GetStr("name")
+	name, _ := claims.GetStr("name")
 	fmt.Println(name)
 	// Output: John Doe
 }
@@ -86,7 +86,8 @@ func Example_claimsToStruct() {
 	info := Info{}
 	claims.ToStruct(&info)
 
-	fmt.Println(claims.GetStr("name"))
+	name, _ := claims.GetStr("name")
+	fmt.Println(name)
 	// output: Billy Mister
 }
 

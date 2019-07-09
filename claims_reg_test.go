@@ -8,7 +8,7 @@ import (
 func TestTokenId(t *testing.T) {
 	claims := New()
 	claims.SetTokenID()
-	tokenID := claims.GetTokenID()
+	tokenID, _ := claims.GetTokenID()
 	if tokenID == "" {
 		t.Error("token id was not set")
 	}
@@ -16,7 +16,7 @@ func TestTokenId(t *testing.T) {
 	if claims.Has(TokenID) {
 		t.Error("token id should have been deleted")
 	}
-	tokenID = claims.GetTokenID()
+	tokenID, _ = claims.GetTokenID()
 	if tokenID != "" {
 		t.Error("should have gotten blank value")
 	}
@@ -25,7 +25,7 @@ func TestTokenId(t *testing.T) {
 func TestIssuer(t *testing.T) {
 	claims := New()
 	claims.SetIssuer("Google")
-	issuer := claims.GetIssuer()
+	issuer, _ := claims.GetIssuer()
 	if issuer != "Google" {
 		t.Error("issuer was not set")
 	}
@@ -33,7 +33,7 @@ func TestIssuer(t *testing.T) {
 	if claims.Has(Issuer) {
 		t.Error("issuer should have been deleted")
 	}
-	issuer = claims.GetIssuer()
+	issuer, _ = claims.GetIssuer()
 	if issuer != "" {
 		t.Error("should have gotten blank value")
 	}
@@ -42,7 +42,7 @@ func TestIssuer(t *testing.T) {
 func TestAudience(t *testing.T) {
 	claims := New()
 	claims.SetAudience([]string{"Google", "Facebook"})
-	audience := claims.GetAudience()
+	audience, _ := claims.GetAudience()
 	if len(audience) != 2 || audience[0] != "Google" || audience[1] != "Facebook" {
 		t.Error("audience was not set")
 	}
@@ -50,7 +50,7 @@ func TestAudience(t *testing.T) {
 	if claims.Has(Audience) {
 		t.Error("audience should have been deleted")
 	}
-	audience = claims.GetAudience()
+	audience, _ = claims.GetAudience()
 	if len(audience) != 0 {
 		t.Error("should have gotten empty string array")
 	}
@@ -59,7 +59,7 @@ func TestAudience(t *testing.T) {
 func TestSubject(t *testing.T) {
 	claims := New()
 	claims.SetSubject("Google")
-	subject := claims.GetSubject()
+	subject, _ := claims.GetSubject()
 	if subject != "Google" {
 		t.Error("subject was not set")
 	}
@@ -67,7 +67,7 @@ func TestSubject(t *testing.T) {
 	if claims.Has(Subject) {
 		t.Error("subject should have been deleted")
 	}
-	subject = claims.GetSubject()
+	subject, _ = claims.GetSubject()
 	if subject != "" {
 		t.Error("should have gotten blank value")
 	}
@@ -77,7 +77,7 @@ func TestIssuedAt(t *testing.T) {
 	now := time.Now()
 	claims := New()
 	claims.SetIssuedAt(now)
-	issuedAt := claims.GetIssuedAt()
+	issuedAt, _ := claims.GetIssuedAt()
 	if issuedAt != now.Unix() {
 		t.Error("issuedAt was not set")
 	}
@@ -85,7 +85,7 @@ func TestIssuedAt(t *testing.T) {
 	if claims.Has(IssuedAt) {
 		t.Error("issuedAt should have been deleted")
 	}
-	issuedAt = claims.GetIssuedAt()
+	issuedAt, _ = claims.GetIssuedAt()
 	if issuedAt != 0 {
 		t.Error("should have gotten 0 value")
 	}
@@ -94,7 +94,7 @@ func TestExpiresAt(t *testing.T) {
 	now := time.Now()
 	claims := New()
 	claims.SetExpiresAt(now)
-	expiresAt := claims.GetExpiresAt()
+	expiresAt, _ := claims.GetExpiresAt()
 	if expiresAt != now.Unix() {
 		t.Error("expiresAt was not set")
 	}
@@ -102,7 +102,7 @@ func TestExpiresAt(t *testing.T) {
 	if claims.Has(ExpiresAt) {
 		t.Error("expiresAt should have been deleted")
 	}
-	expiresAt = claims.GetExpiresAt()
+	expiresAt, _ = claims.GetExpiresAt()
 	if expiresAt != 0 {
 		t.Error("should have gotten 0 value")
 	}
@@ -112,7 +112,7 @@ func TestNotBeforeAt(t *testing.T) {
 	now := time.Now()
 	claims := New()
 	claims.SetNotBeforeAt(now)
-	notBeforeAt := claims.GetNotBeforeAt()
+	notBeforeAt, _ := claims.GetNotBeforeAt()
 	if notBeforeAt != now.Unix() {
 		t.Error("notBeforeAt was not set")
 	}
@@ -120,7 +120,7 @@ func TestNotBeforeAt(t *testing.T) {
 	if claims.Has(NotBeforeAt) {
 		t.Error("NotBeforeAt should have been deleted")
 	}
-	notBeforeAt = claims.GetNotBeforeAt()
+	notBeforeAt, _ = claims.GetNotBeforeAt()
 	if notBeforeAt != 0 {
 		t.Error("should have gotten 0 value")
 	}

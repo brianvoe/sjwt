@@ -8,7 +8,7 @@ var secretKey = []byte("whats up yall")
 
 func TestGenerate(t *testing.T) {
 	claims := New()
-	claims.Add("hello", "world")
+	claims.Set("hello", "world")
 	jwt := claims.Generate(secretKey)
 	if jwt == "" {
 		t.Error("jwt is empty")
@@ -18,14 +18,14 @@ func TestGenerate(t *testing.T) {
 func BenchmarkGenerate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		claims := New()
-		claims.Add("hello", "world")
+		claims.Set("hello", "world")
 		claims.Generate(secretKey)
 	}
 }
 
 func TestParse(t *testing.T) {
 	claims := New()
-	claims.Add("hello", "world")
+	claims.Set("hello", "world")
 	jwt := claims.Generate(secretKey)
 
 	newClaims, err := Parse(jwt)
@@ -58,7 +58,7 @@ func TestParseDecodeError(t *testing.T) {
 
 func TestVerify(t *testing.T) {
 	claims := New()
-	claims.Add("hello", "world")
+	claims.Set("hello", "world")
 	jwt := claims.Generate(secretKey)
 
 	verified := Verify(jwt, secretKey)

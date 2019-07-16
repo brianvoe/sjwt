@@ -28,8 +28,8 @@ func TestToClaims(t *testing.T) {
 
 func TestToStruct(t *testing.T) {
 	claims := New()
-	claims.Add("first_name", "Billy")
-	claims.Add("last_name", "Mister")
+	claims.Set("first_name", "Billy")
+	claims.Set("last_name", "Mister")
 
 	// Try to set claims into struct
 	var test testStruc

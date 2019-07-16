@@ -5,8 +5,8 @@ import (
 	"strconv"
 )
 
-// Add adds a name/value to claims
-func (c Claims) Add(name string, value interface{}) { c[name] = value }
+// Set adds/sets a name/value to claims
+func (c Claims) Set(name string, value interface{}) { c[name] = value }
 
 // Del deletes a name/value from claims
 func (c Claims) Del(name string) { delete(c, name) }

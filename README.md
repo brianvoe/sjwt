@@ -7,10 +7,10 @@ Simple JSON Web Token - Uses HMAC SHA-256
 
 ## Example
 ```go
-// Add Claims
+// Set Claims
 claims := New()
-claims.Add("username", "billymister")
-claims.Add("account_id", 8675309)
+claims.Set("username", "billymister")
+claims.Set("account_id", 8675309)
 
 // Generate jwt
 secretKey := []byte("secret_key_here")
@@ -27,9 +27,24 @@ claims, _ := Parse(jwt)
 name, err := claims.GetStr("name") // John Doe
 ```
 
+## Example verify and validate
+```go
+jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+secretKey := []byte("secret_key_here")
+
+// Verify that the secret signature is valid
+hasVerified := Verify(jwt, secretKey)
+
+// Parse jwt
+claims, _ := Parse(jwt)
+
+// Validate will check(if set) Expiration At and Not Before At dates
+err := claims.Validate()
+```
+
 ## Example usage of registered claims
 ```go
-// Add Claims
+// Set Claims
 claims := New()
 claims.SetTokenID()                                  // UUID generated
 claims.SetSubject("Subject Title")                   // Subject of the token
@@ -60,4 +75,4 @@ jwt := claims.Generate(secretKey)
 ```
 
 ## Why?
-For all the times ive needed the use of a jwt, its always been a simple HMAC SHA-256 and thats normally the use of most jwt tokens.
+For all the times I have needed the use of a jwt, its always been a simple HMAC SHA-256 and thats normally the use of most jwt tokens.

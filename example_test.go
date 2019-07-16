@@ -8,8 +8,8 @@ import (
 func Example() {
 	// Add Claims
 	claims := New()
-	claims.Add("username", "billymister")
-	claims.Add("account_id", 8675309)
+	claims.Set("username", "billymister")
+	claims.Set("account_id", 8675309)
 
 	// Generate jwt
 	secretKey := []byte("secret_key_here")
@@ -48,8 +48,8 @@ func Example_registeredClaims() {
 func Example_publicClaims() {
 	// Add Claims
 	claims := New()
-	claims.Add("username", "billymister")
-	claims.Add("account_id", 8675309)
+	claims.Set("username", "billymister")
+	claims.Set("account_id", 8675309)
 
 	// Generate jwt
 	secretKey := []byte("secret_key_here")

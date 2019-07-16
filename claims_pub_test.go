@@ -4,19 +4,19 @@ import "testing"
 
 func TestClaims(t *testing.T) {
 	claims := New()
-	claims.Add("temp", "temp val")
-	claims.Add("bool", true)
-	claims.Add("stringbool", "true")
-	claims.Add("string", "hello world")
-	claims.Add("intstring", 8675309)
-	claims.Add("float32string", float32(86753.09))
-	claims.Add("float64string", float64(86753.09))
-	claims.Add("int", 8675309)
-	claims.Add("uintint", uint(8675309))
-	claims.Add("floatint", 86753.09)
-	claims.Add("stringint", "8675309")
-	claims.Add("float", 8675309.69)
-	claims.Add("stringfloat", "8675309.69")
+	claims.Set("temp", "temp val")
+	claims.Set("bool", true)
+	claims.Set("stringbool", "true")
+	claims.Set("string", "hello world")
+	claims.Set("intstring", 8675309)
+	claims.Set("float32string", float32(86753.09))
+	claims.Set("float64string", float64(86753.09))
+	claims.Set("int", 8675309)
+	claims.Set("uintint", uint(8675309))
+	claims.Set("floatint", 86753.09)
+	claims.Set("stringint", "8675309")
+	claims.Set("float", 8675309.69)
+	claims.Set("stringfloat", "8675309.69")
 
 	// Check has function
 	if !claims.Has("temp") {

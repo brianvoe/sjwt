@@ -53,6 +53,9 @@ func Parse(tokenStr string) (Claims, error) {
 // Verify will take in the token string and secret and identify the signature matches
 func Verify(tokenStr string, secret []byte) bool {
 	token := strings.Split(tokenStr, ".")
+	if len(token) != 3 {
+		return false
+	}
 	mac := hmac.New(sha256.New, secret)
 	mac.Write([]byte(fmt.Sprintf("%s.%s", token[0], token[1])))
 	sig, _ := base64.RawURLEncoding.DecodeString(token[2])

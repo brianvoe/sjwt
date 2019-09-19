@@ -82,3 +82,12 @@ func TestVerifyError(t *testing.T) {
 		t.Error("verification should have failed")
 	}
 }
+
+func TestVerifyInvalidJWTError(t *testing.T) {
+	jwt := "not_a_jwt"
+
+	verified := Verify(jwt, secretKey)
+	if verified {
+		t.Error("verification should have failed")
+	}
+}

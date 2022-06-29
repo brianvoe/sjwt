@@ -4,11 +4,14 @@
 Simple JSON Web Token - Uses HMAC SHA-256
 
 <a href="https://www.buymeacoffee.com/brianvoe" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+## Install
+
+`go get -u github.com/brianvoe/sjwt`
 
 ## Example
 ```go
 // Set Claims
-claims := New()
+claims := sjwt.New()
 claims.Set("username", "billymister")
 claims.Set("account_id", 8675309)
 
@@ -21,7 +24,7 @@ jwt := claims.Generate(secretKey)
 ```go
 // Parse jwt
 jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-claims, _ := Parse(jwt)
+claims, _ := sjwt.Parse(jwt)
 
 // Get claims
 name, err := claims.GetStr("name") // John Doe
@@ -33,10 +36,10 @@ jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI
 secretKey := []byte("secret_key_here")
 
 // Verify that the secret signature is valid
-hasVerified := Verify(jwt, secretKey)
+hasVerified := sjwt.Verify(jwt, secretKey)
 
 // Parse jwt
-claims, _ := Parse(jwt)
+claims, _ := sjwt.Parse(jwt)
 
 // Validate will check(if set) Expiration At and Not Before At dates
 err := claims.Validate()
@@ -45,7 +48,7 @@ err := claims.Validate()
 ## Example usage of registered claims
 ```go
 // Set Claims
-claims := New()
+claims := sjwt.New()
 claims.SetTokenID()                                  // UUID generated
 claims.SetSubject("Subject Title")                   // Subject of the token
 claims.SetIssuer("Google")                           // Issuer of the token
@@ -67,7 +70,7 @@ type Info struct {
 
 // Marshal your struct into claims
 info := Info{Name: "Billy Mister"}
-claims, _ := ToClaims(info)
+claims, _ := sjwt.ToClaims(info)
 
 // Generate jwt
 secretKey := []byte("secret_key_here")

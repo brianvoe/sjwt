@@ -1,14 +1,28 @@
 ![alt text](https://raw.githubusercontent.com/brianvoe/sjwt/master/logo.png)
 
-# sjwt [![Go Report Card](https://goreportcard.com/badge/github.com/brianvoe/sjwt)](https://goreportcard.com/report/github.com/brianvoe/sjwt) [![Build Status](https://travis-ci.org/brianvoe/sjwt.svg?branch=master)](https://travis-ci.org/brianvoe/sjwt) [![codecov.io](https://codecov.io/github/brianvoe/sjwt/branch/master/graph/badge.svg)](https://codecov.io/github/brianvoe/sjwt) [![GoDoc](https://godoc.org/github.com/brianvoe/sjwt?status.svg)](https://godoc.org/github.com/brianvoe/sjwt) [![license](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/brianvoe/sjwt/master/LICENSE)
-Simple JSON Web Token - Uses HMAC SHA-256
+# sjwt [![Go Report Card](https://goreportcard.com/badge/github.com/brianvoe/sjwt)](https://goreportcard.com/report/github.com/brianvoe/sjwt) [![GoDoc](https://godoc.org/github.com/brianvoe/sjwt?status.svg)](https://godoc.org/github.com/brianvoe/sjwt) [![license](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/brianvoe/sjwt/master/LICENSE)
 
 <a href="https://www.buymeacoffee.com/brianvoe" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+
+Simple JSON Web Token - Uses HMAC SHA-256
+
+Minimalistic and efficient tool for handling JSON Web Tokens in Go applications. It offers a straightforward approach to integrating JWT for authentication and security, designed for ease of use.
+
+## Features
+
+- **Easy JWT for Go**: Implement JWT in Go with minimal effort.
+- **Secure & Simple**: Reliable security features, easy to integrate.
+- **Open Source**: MIT licensed, open for community contributions.
+
+## Install
+```bash 
+go get -u github.com/brianvoe/sjwt
+```
 
 ## Example
 ```go
 // Set Claims
-claims := New()
+claims := sjwt.New()
 claims.Set("username", "billymister")
 claims.Set("account_id", 8675309)
 
@@ -21,7 +35,7 @@ jwt := claims.Generate(secretKey)
 ```go
 // Parse jwt
 jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-claims, _ := Parse(jwt)
+claims, _ := sjwt.Parse(jwt)
 
 // Get claims
 name, err := claims.GetStr("name") // John Doe
@@ -33,10 +47,10 @@ jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI
 secretKey := []byte("secret_key_here")
 
 // Verify that the secret signature is valid
-hasVerified := Verify(jwt, secretKey)
+hasVerified := sjwt.Verify(jwt, secretKey)
 
 // Parse jwt
-claims, _ := Parse(jwt)
+claims, _ := sjwt.Parse(jwt)
 
 // Validate will check(if set) Expiration At and Not Before At dates
 err := claims.Validate()
@@ -45,7 +59,7 @@ err := claims.Validate()
 ## Example usage of registered claims
 ```go
 // Set Claims
-claims := New()
+claims := sjwt.New()
 claims.SetTokenID()                                  // UUID generated
 claims.SetSubject("Subject Title")                   // Subject of the token
 claims.SetIssuer("Google")                           // Issuer of the token
@@ -67,7 +81,7 @@ type Info struct {
 
 // Marshal your struct into claims
 info := Info{Name: "Billy Mister"}
-claims, _ := ToClaims(info)
+claims, _ := sjwt.ToClaims(info)
 
 // Generate jwt
 secretKey := []byte("secret_key_here")

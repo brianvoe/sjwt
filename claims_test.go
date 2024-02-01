@@ -54,6 +54,10 @@ func TestValidate(t *testing.T) {
 	// Validate on parsed claims
 	token := claims.Generate([]byte(secretKey))
 	parsedClaims, err := Parse(token)
+	if err != nil {
+		t.Error("Error parsing token: ", err)
+	}
+
 	err = parsedClaims.Validate()
 	if err != nil {
 		t.Error("Validate was not successful on parsed claims when it should be")

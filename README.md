@@ -3,6 +3,9 @@
 # sjwt [![Go Report Card](https://goreportcard.com/badge/github.com/brianvoe/sjwt)](https://goreportcard.com/report/github.com/brianvoe/sjwt) [![GoDoc](https://godoc.org/github.com/brianvoe/sjwt?status.svg)](https://godoc.org/github.com/brianvoe/sjwt) [![license](http://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/brianvoe/sjwt/master/LICENSE)
 
 <a href="https://www.buymeacoffee.com/brianvoe" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+## Install
+
+`go get -u github.com/brianvoe/sjwt`
 
 Simple JSON Web Token - Uses HMAC SHA-256
 

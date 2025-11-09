@@ -25,8 +25,8 @@ const (
 	NotBeforeAt = "nbf"
 )
 
-// SetTokenID will set a random uuid v4 id
-func (c Claims) SetTokenID() { c[TokenID] = UUID() }
+// SetTokenID will set a random id
+func (c Claims) SetTokenID() { c[TokenID] = ID() }
 
 // DeleteTokenID deletes token id
 func (c Claims) DeleteTokenID() { delete(c, TokenID) }

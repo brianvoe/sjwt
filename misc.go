@@ -2,33 +2,53 @@ package sjwt
 
 import (
 	"crypto/rand"
-	"encoding/hex"
+	"encoding/binary"
 )
 
-// UUID (version 4) will generate a random unique identifier based upon random nunbers
-// Format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
-func UUID() string {
-	version := byte(4)
-	uuid := make([]byte, 16)
-	rand.Read(uuid)
+const (
+	idLength       = 20
+	idBitsPerChar  = 5
+	idAlphabetMask = (1 << idBitsPerChar) - 1
+	// readable 32 chars, (no 0, o, 1, i, l)
+	// 0 and o are removed to avoid confusion with each other
+	// 1, i, l are removed to avoid confusion with each other
+	// extra g was added to fit 32 chars
+	idAlphabetStr = "23456789abcdefgghjkmnpqrstuvwxyz"
+)
 
-	// Set version
-	uuid[6] = (uuid[6] & 0x0f) | (version << 4)
+var idAlphabet = []byte(idAlphabetStr)
 
-	// Set variant
-	uuid[8] = (uuid[8] & 0xbf) | 0x80
+// ID returns a 20 character, crypto-random identifier using a friendly alphabet.
+func ID() string {
+	out := make([]byte, idLength)
+	var cache uint64
+	var bits uint
 
-	buf := make([]byte, 36)
-	var dash byte = '-'
-	hex.Encode(buf[0:8], uuid[0:4])
-	buf[8] = dash
-	hex.Encode(buf[9:13], uuid[4:6])
-	buf[13] = dash
-	hex.Encode(buf[14:18], uuid[6:8])
-	buf[18] = dash
-	hex.Encode(buf[19:23], uuid[8:10])
-	buf[23] = dash
-	hex.Encode(buf[24:], uuid[10:])
+	for i := 0; i < idLength; {
+		if bits < idBitsPerChar {
+			cache = randomUint64()
+			bits = 64
+		}
 
-	return string(buf)
+		index := cache & idAlphabetMask
+		cache >>= idBitsPerChar
+		bits -= idBitsPerChar
+
+		if int(index) >= len(idAlphabet) {
+			continue
+		}
+
+		out[i] = idAlphabet[index]
+		i++
+	}
+
+	return string(out)
+}
+
+func randomUint64() uint64 {
+	var buf [8]byte
+	if _, err := rand.Read(buf[:]); err != nil {
+		panic(err)
+	}
+	return binary.LittleEndian.Uint64(buf[:])
 }

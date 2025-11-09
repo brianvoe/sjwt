@@ -5,29 +5,6 @@ import (
 	"testing"
 )
 
-// Benchmark results (ns/op, B/op, allocs/op)
-// Apple M1 Max, go test -bench=. -benchmem
-//
-// Before optimization (fmt.Sprintf string assembly):
-//   BenchmarkFullUsage/small-10             4298 ns/op   2881 B/op    57 allocs/op
-//   BenchmarkFullUsage/medium-10           27629 ns/op  35838 B/op   353 allocs/op
-//   BenchmarkFullUsage/large-10           161472 ns/op 109567 B/op  1603 allocs/op
-//
-// After optimization (preallocated byte assembly):
-//   BenchmarkFullUsage/small-10             3965 ns/op   2632 B/op    50 allocs/op
-//   BenchmarkFullUsage/medium-10           27528 ns/op  34622 B/op   343 allocs/op
-//   BenchmarkFullUsage/large-10           156214 ns/op 103267 B/op  1547 allocs/op
-//
-// After consolidation (single end-to-end benchmark):
-//   BenchmarkFullUsage/small-10             4031 ns/op   3297 B/op    57 allocs/op
-//   BenchmarkFullUsage/medium-10           29949 ns/op  21653 B/op   300 allocs/op
-//   BenchmarkFullUsage/large-10           168616 ns/op 108099 B/op  1652 allocs/op
-//
-// After Parse base64 preallocation:
-//   BenchmarkFullUsage/small-10             4048 ns/op   3297 B/op    57 allocs/op
-//   BenchmarkFullUsage/medium-10           29940 ns/op  21653 B/op   300 allocs/op
-//   BenchmarkFullUsage/large-10           168427 ns/op 108135 B/op  1652 allocs/op
-
 type benchCase struct {
 	name           string
 	generateSecret []byte

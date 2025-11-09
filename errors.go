@@ -22,4 +22,16 @@ var (
 	// ErrTokenNotYetValid is an error string clarifying
 	// the current unix timestamp has not exceeded the nbf unix timestamp
 	ErrTokenNotYetValid = errors.New("token is not yet valid")
+
+	// ErrTokenSignatureInvalid clarifies the token signature did not match the expected value
+	ErrTokenSignatureInvalid = errors.New("token signature invalid")
+
+	// ErrTokenHeaderInvalid clarifies the token header is malformed or unsupported
+	ErrTokenHeaderInvalid = errors.New("token header invalid")
+
+	// ErrTokenAlgorithmMismatch clarifies that the token algorithm does not match the supported algorithm
+	ErrTokenAlgorithmMismatch = errors.New("token algorithm mismatch")
+
+	// ErrSecretTooShort clarifies that the provided secret is weaker than the minimum required length
+	ErrSecretTooShort = errors.New("secret key too short; use at least 32 random bytes")
 )

@@ -33,7 +33,9 @@ func TestToStruct(t *testing.T) {
 
 	// Try to set claims into struct
 	var test testStruc
-	claims.ToStruct(&test)
+	if err := claims.ToStruct(&test); err != nil {
+		t.Fatalf("ToStruct returned error: %v", err)
+	}
 
 	if test.FirstName != "Billy" {
 		t.Error("Tried to get first name from test struct after running ToStruct and it failed")
@@ -52,7 +54,11 @@ func TestValidate(t *testing.T) {
 	}
 
 	// Validate on parsed claims
-	token := claims.Generate([]byte(secretKey))
+	token, err := claims.Generate([]byte(secretKey))
+	if err != nil {
+		t.Fatalf("Generate returned error: %v", err)
+	}
+
 	parsedClaims, err := Parse(token)
 	if err != nil {
 		t.Error("Error parsing token: ", err)

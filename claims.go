@@ -6,7 +6,7 @@ import (
 )
 
 // Claims is the main container for our body information
-type Claims map[string]interface{}
+type Claims map[string]any
 
 // New will initiate a new claims
 func New() *Claims {
@@ -14,10 +14,13 @@ func New() *Claims {
 }
 
 // ToClaims takes in an interface and unmarshals it to claims
-func ToClaims(struc interface{}) (Claims, error) {
-	strucBytes, _ := json.Marshal(struc)
+func ToClaims(struc any) (Claims, error) {
+	strucBytes, err := json.Marshal(struc)
+	if err != nil {
+		return nil, err
+	}
 	var claims Claims
-	err := json.Unmarshal(strucBytes, &claims)
+	err = json.Unmarshal(strucBytes, &claims)
 	if err != nil {
 		return nil, err
 	}
@@ -26,9 +29,13 @@ func ToClaims(struc interface{}) (Claims, error) {
 }
 
 // ToStruct takes your claims and sets value to struct
-func (c Claims) ToStruct(struc interface{}) error {
-	claimsBytes, _ := json.Marshal(c)
-	err := json.Unmarshal(claimsBytes, struc)
+func (c Claims) ToStruct(struc any) error {
+	claimsBytes, err := json.Marshal(c)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(claimsBytes, struc)
 	if err != nil {
 		return err
 	}

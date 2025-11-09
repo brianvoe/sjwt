@@ -6,7 +6,7 @@ import (
 )
 
 // Set adds/sets a name/value to claims
-func (c Claims) Set(name string, value interface{}) { c[name] = value }
+func (c Claims) Set(name string, value any) { c[name] = value }
 
 // Del deletes a name/value from claims
 func (c Claims) Del(name string) { delete(c, name) }
@@ -15,7 +15,7 @@ func (c Claims) Del(name string) { delete(c, name) }
 func (c Claims) Has(name string) bool { _, ok := c[name]; return ok }
 
 // Get gets claim value
-func (c Claims) Get(name string) (interface{}, error) {
+func (c Claims) Get(name string) (any, error) {
 	if !c.Has(name) {
 		return nil, ErrNotFound
 	}

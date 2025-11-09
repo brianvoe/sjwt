@@ -13,14 +13,20 @@ func Example() {
 
 	// Generate jwt
 	secretKey := []byte("secret_key_here")
-	jwt := claims.Generate(secretKey)
+	jwt, err := claims.Generate(secretKey)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println(jwt)
 }
 
 func Example_parse() {
 	// Parse jwt
 	jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-	claims, _ := Parse(jwt)
+	claims, err := Parse(jwt)
+	if err != nil {
+		panic(err)
+	}
 
 	// Get claims
 	name, _ := claims.GetStr("name")
@@ -41,7 +47,10 @@ func Example_registeredClaims() {
 
 	// Generate jwt
 	secretKey := []byte("secret_key_here")
-	jwt := claims.Generate(secretKey)
+	jwt, err := claims.Generate(secretKey)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println(jwt)
 }
 
@@ -53,7 +62,10 @@ func Example_publicClaims() {
 
 	// Generate jwt
 	secretKey := []byte("secret_key_here")
-	jwt := claims.Generate(secretKey)
+	jwt, err := claims.Generate(secretKey)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println(jwt)
 }
 
@@ -64,11 +76,17 @@ func Example_structToClaims() {
 
 	// Marshal your struct into claims
 	info := Info{Name: "Billy Mister"}
-	claims, _ := ToClaims(info)
+	claims, err := ToClaims(info)
+	if err != nil {
+		panic(err)
+	}
 
 	// Generate jwt
 	secretKey := []byte("secret_key_here")
-	jwt := claims.Generate(secretKey)
+	jwt, err := claims.Generate(secretKey)
+	if err != nil {
+		panic(err)
+	}
 	fmt.Println(jwt)
 	// output: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQmlsbHkgTWlzdGVyIn0.2FYrpCNy1tg_4UvimpSrgAy-nT9snh-l4w9VLz71b6Y
 }
@@ -80,11 +98,16 @@ func Example_claimsToStruct() {
 
 	// Parse jwt
 	jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQmlsbHkgTWlzdGVyIn0.2FYrpCNy1tg_4UvimpSrgAy-nT9snh-l4w9VLz71b6Y"
-	claims, _ := Parse(jwt)
+	claims, err := Parse(jwt)
+	if err != nil {
+		panic(err)
+	}
 
 	// Marshal your struct into claims
 	info := Info{}
-	claims.ToStruct(&info)
+	if err := claims.ToStruct(&info); err != nil {
+		panic(err)
+	}
 
 	name, _ := claims.GetStr("name")
 	fmt.Println(name)

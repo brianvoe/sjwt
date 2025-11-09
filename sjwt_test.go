@@ -9,7 +9,10 @@ var secretKey = []byte("whats up yall")
 func TestGenerate(t *testing.T) {
 	claims := New()
 	claims.Set("hello", "world")
-	jwt := claims.Generate(secretKey)
+	jwt, err := claims.Generate(secretKey)
+	if err != nil {
+		t.Fatalf("Generate returned error: %v", err)
+	}
 	if jwt == "" {
 		t.Error("jwt is empty")
 	}
@@ -19,14 +22,19 @@ func BenchmarkGenerate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		claims := New()
 		claims.Set("hello", "world")
-		claims.Generate(secretKey)
+		if _, err := claims.Generate(secretKey); err != nil {
+			b.Fatalf("Generate returned error: %v", err)
+		}
 	}
 }
 
 func TestParse(t *testing.T) {
 	claims := New()
 	claims.Set("hello", "world")
-	jwt := claims.Generate(secretKey)
+	jwt, err := claims.Generate(secretKey)
+	if err != nil {
+		t.Fatalf("Generate returned error: %v", err)
+	}
 
 	newClaims, err := Parse(jwt)
 	if err != nil {
@@ -59,7 +67,10 @@ func TestParseDecodeError(t *testing.T) {
 func TestVerify(t *testing.T) {
 	claims := New()
 	claims.Set("hello", "world")
-	jwt := claims.Generate(secretKey)
+	jwt, err := claims.Generate(secretKey)
+	if err != nil {
+		t.Fatalf("Generate returned error: %v", err)
+	}
 
 	verified := Verify(jwt, secretKey)
 	if !verified {

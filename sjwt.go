@@ -10,10 +10,18 @@ import (
 )
 
 // Generate takes in claims and a secret and outputs jwt token
-func (c Claims) Generate(secret []byte) string {
+func (c Claims) Generate(secret []byte) (string, error) {
 	// Encode header and claims
-	headerEnc, _ := json.Marshal(map[string]string{"typ": "JWT", "alg": "HS256"})
-	claimsEnc, _ := json.Marshal(c)
+	headerEnc, err := json.Marshal(map[string]string{"typ": "JWT", "alg": "HS256"})
+	if err != nil {
+		return "", err
+	}
+
+	claimsEnc, err := json.Marshal(c)
+	if err != nil {
+		return "", err
+	}
+
 	jwtStr := fmt.Sprintf(
 		"%s.%s",
 		base64.RawURLEncoding.EncodeToString(headerEnc),
@@ -24,7 +32,7 @@ func (c Claims) Generate(secret []byte) string {
 	mac := hmac.New(sha256.New, secret)
 	mac.Write([]byte(jwtStr))
 
-	return fmt.Sprintf("%s.%s", jwtStr, base64.RawURLEncoding.EncodeToString(mac.Sum(nil)))
+	return fmt.Sprintf("%s.%s", jwtStr, base64.RawURLEncoding.EncodeToString(mac.Sum(nil))), nil
 }
 
 // Parse will take in the token string grab the body and unmarshal into claims interface

@@ -28,14 +28,20 @@ claims.Set("account_id", 8675309)
 
 // Generate jwt
 secretKey := []byte("secret_key_here")
-jwt := claims.Generate(secretKey)
+jwt, err := claims.Generate(secretKey)
+if err != nil {
+    panic(err)
+}
 ```
 
 ## Example parse
 ```go
 // Parse jwt
 jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-claims, _ := sjwt.Parse(jwt)
+claims, err := sjwt.Parse(jwt)
+if err != nil {
+    panic(err)
+}
 
 // Get claims
 name, err := claims.GetStr("name") // John Doe
@@ -50,10 +56,13 @@ secretKey := []byte("secret_key_here")
 hasVerified := sjwt.Verify(jwt, secretKey)
 
 // Parse jwt
-claims, _ := sjwt.Parse(jwt)
+claims, err := sjwt.Parse(jwt)
+if err != nil {
+    panic(err)
+}
 
 // Validate will check(if set) Expiration At and Not Before At dates
-err := claims.Validate()
+err = claims.Validate()
 ```
 
 ## Example usage of registered claims
@@ -70,7 +79,10 @@ claims.SetExpiresAt(time.Now().Add(time.Hour * 24))  // Token expires in 24 hour
 
 // Generate jwt
 secretKey := []byte("secret_key_here")
-jwt := claims.Generate(secretKey)
+jwt, err := claims.Generate(secretKey)
+if err != nil {
+    panic(err)
+}
 ```
 
 ## Example usage of struct to claims
@@ -81,11 +93,17 @@ type Info struct {
 
 // Marshal your struct into claims
 info := Info{Name: "Billy Mister"}
-claims, _ := sjwt.ToClaims(info)
+claims, err := sjwt.ToClaims(info)
+if err != nil {
+    panic(err)
+}
 
 // Generate jwt
 secretKey := []byte("secret_key_here")
-jwt := claims.Generate(secretKey)
+jwt, err := claims.Generate(secretKey)
+if err != nil {
+    panic(err)
+}
 ```
 
 ## Why?

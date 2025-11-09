@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 )
 
 const (
@@ -39,13 +38,32 @@ func (c Claims) Generate(secret []byte) (string, error) {
 		return "", err
 	}
 
-	jwtStr := base64.RawURLEncoding.EncodeToString(headerEnc) + "." + base64.RawURLEncoding.EncodeToString(claimsEnc)
+	headerEncoded := make([]byte, base64.RawURLEncoding.EncodedLen(len(headerEnc)))
+	base64.RawURLEncoding.Encode(headerEncoded, headerEnc)
+
+	payloadEncoded := make([]byte, base64.RawURLEncoding.EncodedLen(len(claimsEnc)))
+	base64.RawURLEncoding.Encode(payloadEncoded, claimsEnc)
+
+	unsignedLen := len(headerEncoded) + 1 + len(payloadEncoded)
+	unsigned := make([]byte, unsignedLen)
+	copy(unsigned, headerEncoded)
+	unsigned[len(headerEncoded)] = '.'
+	copy(unsigned[len(headerEncoded)+1:], payloadEncoded)
 
 	// Sign with sha 256
 	mac := hmac.New(sha256.New, secret)
-	mac.Write([]byte(jwtStr))
+	mac.Write(unsigned)
 
-	return fmt.Sprintf("%s.%s", jwtStr, base64.RawURLEncoding.EncodeToString(mac.Sum(nil))), nil
+	sig := mac.Sum(nil)
+	signatureEncoded := make([]byte, base64.RawURLEncoding.EncodedLen(len(sig)))
+	base64.RawURLEncoding.Encode(signatureEncoded, sig)
+
+	token := make([]byte, unsignedLen+1+len(signatureEncoded))
+	copy(token, unsigned)
+	token[unsignedLen] = '.'
+	copy(token[unsignedLen+1:], signatureEncoded)
+
+	return string(token), nil
 }
 
 // Parse takes in the token string and returns the claims payload (without verifying the signature)
@@ -59,10 +77,15 @@ func Parse(tokenStr string) (Claims, error) {
 		return nil, err
 	}
 
-	claimsByte, err := base64.RawURLEncoding.DecodeString(tokenArray[payloadSegmentIdx])
+	payload := tokenArray[payloadSegmentIdx]
+
+	decodedLen := base64.RawURLEncoding.DecodedLen(len(payload))
+	claimsByte := make([]byte, decodedLen)
+	n, err := base64.RawURLEncoding.Decode(claimsByte, []byte(payload))
 	if err != nil {
 		return nil, err
 	}
+	claimsByte = claimsByte[:n]
 
 	var claims Claims
 	err = json.Unmarshal(claimsByte, &claims)
@@ -90,8 +113,17 @@ func verifySignature(token []string, secret []byte) error {
 		return ErrSecretTooShort
 	}
 
+	header := token[headerSegmentIdx]
+	payload := token[payloadSegmentIdx]
+
+	unsignedLen := len(header) + 1 + len(payload)
+	unsigned := make([]byte, unsignedLen)
+	copy(unsigned, header)
+	unsigned[len(header)] = '.'
+	copy(unsigned[len(header)+1:], payload)
+
 	mac := hmac.New(sha256.New, secret)
-	mac.Write([]byte(token[headerSegmentIdx] + "." + token[payloadSegmentIdx]))
+	mac.Write(unsigned)
 	sig, err := base64.RawURLEncoding.DecodeString(token[signatureSegmentIdx])
 	if err != nil {
 		return ErrTokenSignatureInvalid

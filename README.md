@@ -15,6 +15,9 @@ Minimalistic and efficient tool for handling JSON Web Tokens in Go applications.
 - **Open Source**: MIT licensed, open for community contributions.
 
 ## Install
+
+> **Security note:** `Generate` and `Verify` require secrets that are at least 32 random bytes. Generate keys with `crypto/rand` (for example `hex.EncodeToString`) rather than hard-coding test values in production.
+
 ```bash 
 go get -u github.com/brianvoe/sjwt
 ```
@@ -27,7 +30,7 @@ claims.Set("username", "billymister")
 claims.Set("account_id", 8675309)
 
 // Generate jwt
-secretKey := []byte("secret_key_here")
+secretKey := []byte("0123456789abcdef0123456789abcdef")
 jwt, err := claims.Generate(secretKey)
 if err != nil {
     panic(err)
@@ -36,33 +39,53 @@ if err != nil {
 
 ## Example parse
 ```go
-// Parse jwt
-jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-claims, err := sjwt.Parse(jwt)
+secretKey := []byte("0123456789abcdef0123456789abcdef")
+
+// Create a token
+claims := sjwt.New()
+claims.Set("name", "John Doe")
+jwt, err := claims.Generate(secretKey)
+if err != nil {
+    panic(err)
+}
+
+// Parse jwt (no signature verification yet)
+parsed, err := sjwt.Parse(jwt)
 if err != nil {
     panic(err)
 }
 
 // Get claims
-name, err := claims.GetStr("name") // John Doe
+name, err := parsed.GetStr("name") // John Doe
 ```
 
 ## Example verify and validate
 ```go
-jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-secretKey := []byte("secret_key_here")
+secretKey := []byte("0123456789abcdef0123456789abcdef")
 
-// Verify that the secret signature is valid
-hasVerified := sjwt.Verify(jwt, secretKey)
+// Create a token
+claims := sjwt.New()
+claims.Set("name", "John Doe")
+jwt, err := claims.Generate(secretKey)
+if err != nil {
+    panic(err)
+}
 
-// Parse jwt
-claims, err := sjwt.Parse(jwt)
+// Verify the signature before trusting the payload
+if !sjwt.Verify(jwt, secretKey) {
+    panic("signature mismatch")
+}
+
+// Parse the payload
+parsedClaims, err := sjwt.Parse(jwt)
 if err != nil {
     panic(err)
 }
 
 // Validate will check(if set) Expiration At and Not Before At dates
-err = claims.Validate()
+if err := parsedClaims.Validate(); err != nil {
+    panic(err)
+}
 ```
 
 ## Example usage of registered claims
@@ -78,7 +101,7 @@ claims.SetNotBeforeAt(time.Now().Add(time.Hour * 1)) // Token valid in 1 hour
 claims.SetExpiresAt(time.Now().Add(time.Hour * 24))  // Token expires in 24 hours
 
 // Generate jwt
-secretKey := []byte("secret_key_here")
+secretKey := []byte("0123456789abcdef0123456789abcdef")
 jwt, err := claims.Generate(secretKey)
 if err != nil {
     panic(err)
@@ -99,7 +122,7 @@ if err != nil {
 }
 
 // Generate jwt
-secretKey := []byte("secret_key_here")
+secretKey := []byte("0123456789abcdef0123456789abcdef")
 jwt, err := claims.Generate(secretKey)
 if err != nil {
     panic(err)

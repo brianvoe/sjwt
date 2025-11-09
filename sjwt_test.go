@@ -1,10 +1,11 @@
 package sjwt
 
 import (
+	"encoding/base64"
 	"testing"
 )
 
-var secretKey = []byte("whats up yall")
+var secretKey = []byte("0123456789abcdef0123456789abcdef")
 
 func TestGenerate(t *testing.T) {
 	claims := New()
@@ -81,6 +82,11 @@ func TestVerify(t *testing.T) {
 	if verified {
 		t.Error("verification should have failed")
 	}
+
+	verified = Verify(jwt, []byte("short secret"))
+	if verified {
+		t.Error("verification should have failed with short secret")
+	}
 }
 
 func TestVerifyError(t *testing.T) {
@@ -100,5 +106,23 @@ func TestVerifyInvalidJWTError(t *testing.T) {
 	verified := Verify(jwt, secretKey)
 	if verified {
 		t.Error("verification should have failed")
+	}
+}
+
+func TestGenerateSecretTooShort(t *testing.T) {
+	claims := New()
+	claims.Set("hello", "world")
+	if _, err := claims.Generate([]byte("short secret")); err != ErrSecretTooShort {
+		t.Fatalf("expected ErrSecretTooShort, got %v", err)
+	}
+}
+
+func TestParseAlgorithmMismatch(t *testing.T) {
+	// Header with alg none
+	header := base64.RawURLEncoding.EncodeToString([]byte(`{"typ":"JWT","alg":"none"}`))
+	payload := base64.RawURLEncoding.EncodeToString([]byte(`{"sub":"1234567890"}`))
+	token := header + "." + payload + "."
+	if _, err := Parse(token); err != ErrTokenAlgorithmMismatch {
+		t.Fatalf("expected ErrTokenAlgorithmMismatch, got %v", err)
 	}
 }

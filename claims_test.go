@@ -54,7 +54,7 @@ func TestValidate(t *testing.T) {
 	}
 
 	// Validate on parsed claims
-	token, err := claims.Generate([]byte(secretKey))
+	token, err := claims.Generate(secretKey)
 	if err != nil {
 		t.Fatalf("Generate returned error: %v", err)
 	}

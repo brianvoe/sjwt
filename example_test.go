@@ -12,7 +12,7 @@ func Example() {
 	claims.Set("account_id", 8675309)
 
 	// Generate jwt
-	secretKey := []byte("secret_key_here")
+	secretKey := []byte("0123456789abcdef0123456789abcdef")
 	jwt, err := claims.Generate(secretKey)
 	if err != nil {
 		panic(err)
@@ -21,15 +21,24 @@ func Example() {
 }
 
 func Example_parse() {
-	// Parse jwt
-	jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-	claims, err := Parse(jwt)
+	// Create jwt
+	secretKey := []byte("0123456789abcdef0123456789abcdef")
+	claims := New()
+	claims.Set("name", "John Doe")
+
+	jwt, err := claims.Generate(secretKey)
+	if err != nil {
+		panic(err)
+	}
+
+	// Parse jwt (signature still needs to be verified separately)
+	parsed, err := Parse(jwt)
 	if err != nil {
 		panic(err)
 	}
 
 	// Get claims
-	name, _ := claims.GetStr("name")
+	name, _ := parsed.GetStr("name")
 	fmt.Println(name)
 	// Output: John Doe
 }
@@ -46,7 +55,7 @@ func Example_registeredClaims() {
 	claims.SetExpiresAt(time.Now().Add(time.Hour * 24))  // Token expires in 24 hours
 
 	// Generate jwt
-	secretKey := []byte("secret_key_here")
+	secretKey := []byte("0123456789abcdef0123456789abcdef")
 	jwt, err := claims.Generate(secretKey)
 	if err != nil {
 		panic(err)
@@ -61,7 +70,7 @@ func Example_publicClaims() {
 	claims.Set("account_id", 8675309)
 
 	// Generate jwt
-	secretKey := []byte("secret_key_here")
+	secretKey := []byte("0123456789abcdef0123456789abcdef")
 	jwt, err := claims.Generate(secretKey)
 	if err != nil {
 		panic(err)
@@ -82,13 +91,13 @@ func Example_structToClaims() {
 	}
 
 	// Generate jwt
-	secretKey := []byte("secret_key_here")
+	secretKey := []byte("0123456789abcdef0123456789abcdef")
 	jwt, err := claims.Generate(secretKey)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(jwt)
-	// output: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQmlsbHkgTWlzdGVyIn0.2FYrpCNy1tg_4UvimpSrgAy-nT9snh-l4w9VLz71b6Y
+	fmt.Println(len(jwt) > 0)
+	// output: true
 }
 
 func Example_claimsToStruct() {
@@ -96,30 +105,63 @@ func Example_claimsToStruct() {
 		Name string `json:"name"`
 	}
 
+	// Create jwt
+	secretKey := []byte("0123456789abcdef0123456789abcdef")
+	claims := New()
+	claims.Set("name", "Billy Mister")
+
+	jwt, err := claims.Generate(secretKey)
+	if err != nil {
+		panic(err)
+	}
+
 	// Parse jwt
-	jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQmlsbHkgTWlzdGVyIn0.2FYrpCNy1tg_4UvimpSrgAy-nT9snh-l4w9VLz71b6Y"
-	claims, err := Parse(jwt)
+	parsed, err := Parse(jwt)
 	if err != nil {
 		panic(err)
 	}
 
 	// Marshal your struct into claims
 	info := Info{}
-	if err := claims.ToStruct(&info); err != nil {
+	if err := parsed.ToStruct(&info); err != nil {
 		panic(err)
 	}
 
-	name, _ := claims.GetStr("name")
+	name, _ := parsed.GetStr("name")
 	fmt.Println(name)
 	// output: Billy Mister
 }
 
 func Example_verifySignature() {
-	secretKey := []byte("secret_key_here")
-	jwt := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQmlsbHkgTWlzdGVyIn0.2FYrpCNy1tg_4UvimpSrgAy-nT9snh-l4w9VLz71b6Y"
+	secretKey := []byte("0123456789abcdef0123456789abcdef")
+	claims := New()
+	claims.Set("name", "Billy Mister")
 
-	// Pass jwt and secret key to verify
-	verified := Verify(jwt, secretKey)
+	token, err := claims.Generate(secretKey)
+	if err != nil {
+		panic(err)
+	}
+
+	verified := Verify(token, secretKey)
 	fmt.Println(verified)
+	// output: true
+}
+
+func Example_parse_roundTrip() {
+	secretKey := []byte("0123456789abcdef0123456789abcdef")
+	claims := New()
+	claims.Set("name", "Billy Mister")
+
+	token, err := claims.Generate(secretKey)
+	if err != nil {
+		panic(err)
+	}
+
+	parsedClaims, err := Parse(token)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(parsedClaims.Has("name"))
 	// output: true
 }

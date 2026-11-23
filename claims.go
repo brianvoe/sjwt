@@ -43,13 +43,17 @@ func (c Claims) ToStruct(struc any) error {
 	return nil
 }
 
-// Validate checks expiration and not before times
+// Validate checks expiration and not before times, a time that cannot be read is an ErrClaimValueInvalid
 func (c Claims) Validate() error {
 	now := time.Now().Unix()
 
 	// Check if not before at is set and if current time hasnt started yet
 	if c.Has(NotBeforeAt) {
-		nbf, _ := c.GetNotBeforeAt()
+		nbf, err := c.GetNotBeforeAt()
+		if err != nil {
+			return err
+		}
+
 		if now < nbf {
 			return ErrTokenNotYetValid
 		}
@@ -57,7 +61,11 @@ func (c Claims) Validate() error {
 
 	// Check if expiration at is set and if current time is passed
 	if c.Has(ExpiresAt) {
-		exp, _ := c.GetExpiresAt()
+		exp, err := c.GetExpiresAt()
+		if err != nil {
+			return err
+		}
+
 		if now >= exp {
 			return ErrTokenHasExpired
 		}

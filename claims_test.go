@@ -1,6 +1,7 @@
 package sjwt
 
 import (
+	"strconv"
 	"testing"
 	"time"
 )
@@ -101,5 +102,51 @@ func TestValidateNotBefore(t *testing.T) {
 	err = claims.Validate()
 	if err != ErrTokenNotYetValid {
 		t.Error("Token should have failed due to token not being valid yet")
+	}
+}
+
+// A not before or an expiry that cannot be read as a time is an error: the token must not pass because of it
+func TestValidateMalformedTimes(t *testing.T) {
+	values := map[string]any{
+		"text":   "soon",
+		"bool":   true,
+		"null":   nil,
+		"list":   []any{1},
+		"object": map[string]any{},
+	}
+
+	for _, name := range []string{NotBeforeAt, ExpiresAt} {
+		for label, value := range values {
+			claims := New()
+			claims.Set(name, value)
+
+			token, err := claims.Generate(secretKey)
+			if err != nil {
+				t.Fatalf("Generate returned error: %v", err)
+			}
+
+			parsed, err := Parse(token)
+			if err != nil {
+				t.Fatalf("Parse returned error: %v", err)
+			}
+
+			if err := claims.Validate(); err != ErrClaimValueInvalid {
+				t.Errorf("%s as %s: got %v, want %v", name, label, err, ErrClaimValueInvalid)
+			}
+
+			if err := parsed.Validate(); err != ErrClaimValueInvalid {
+				t.Errorf("%s as %s after Parse: got %v, want %v", name, label, err, ErrClaimValueInvalid)
+			}
+		}
+	}
+}
+
+// A time can still be a number, a number with a fraction or the digits in a string
+func TestValidateTimeFormats(t *testing.T) {
+	claims := New()
+	claims.Set(NotBeforeAt, strconv.FormatInt(time.Now().Add(-time.Hour).Unix(), 10))
+	claims.Set(ExpiresAt, float64(time.Now().Add(time.Hour).Unix())+0.5)
+	if err := claims.Validate(); err != nil {
+		t.Errorf("Validate returned %v for times that are readable", err)
 	}
 }

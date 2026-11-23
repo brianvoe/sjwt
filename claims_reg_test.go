@@ -1,6 +1,7 @@
 package sjwt
 
 import (
+	"slices"
 	"testing"
 	"time"
 )
@@ -53,6 +54,98 @@ func TestAudience(t *testing.T) {
 	audience, _ = claims.GetAudience()
 	if len(audience) != 0 {
 		t.Error("should have gotten empty string array")
+	}
+}
+
+// The audience of a token that went through Parse is a list of values of any type, not a []string
+func TestAudienceAfterParse(t *testing.T) {
+	for _, want := range [][]string{{"Google"}, {"Google", "Facebook"}, {}, {"Zoë", "Ünal", "日本"}} {
+		claims := New()
+		claims.SetAudience(want)
+		token, err := claims.Generate(secretKey)
+		if err != nil {
+			t.Fatalf("Generate returned error: %v", err)
+		}
+
+		parsed, err := Parse(token)
+		if err != nil {
+			t.Fatalf("Parse returned error: %v", err)
+		}
+
+		audience, err := parsed.GetAudience()
+		if err != nil || !slices.Equal(audience, want) {
+			t.Errorf("audience %v after Parse: got %v, %v", want, audience, err)
+		}
+	}
+}
+
+// Parse gives back every registered claim that Generate was given
+func TestRegisteredClaimsAfterParse(t *testing.T) {
+	issuedAt := time.Now().Add(-time.Minute)
+	notBeforeAt := time.Now().Add(-30 * time.Second)
+	expiresAt := time.Now().Add(time.Hour)
+
+	claims := New()
+	claims.SetTokenID()
+	claims.SetIssuer("Google")
+	claims.SetAudience([]string{"Google", "Facebook"})
+	claims.SetSubject("Billy")
+	claims.SetIssuedAt(issuedAt)
+	claims.SetNotBeforeAt(notBeforeAt)
+	claims.SetExpiresAt(expiresAt)
+	tokenID, _ := claims.GetTokenID()
+
+	token, err := claims.Generate(secretKey)
+	if err != nil {
+		t.Fatalf("Generate returned error: %v", err)
+	}
+
+	parsed, err := Parse(token)
+	if err != nil {
+		t.Fatalf("Parse returned error: %v", err)
+	}
+
+	if got, err := parsed.GetTokenID(); err != nil || got != tokenID {
+		t.Errorf("token id after Parse: %q, %v", got, err)
+	}
+	if got, err := parsed.GetIssuer(); err != nil || got != "Google" {
+		t.Errorf("issuer after Parse: %q, %v", got, err)
+	}
+	if got, err := parsed.GetAudience(); err != nil || !slices.Equal(got, []string{"Google", "Facebook"}) {
+		t.Errorf("audience after Parse: %v, %v", got, err)
+	}
+	if got, err := parsed.GetSubject(); err != nil || got != "Billy" {
+		t.Errorf("subject after Parse: %q, %v", got, err)
+	}
+	if got, err := parsed.GetIssuedAt(); err != nil || got != issuedAt.Unix() {
+		t.Errorf("issuedAt after Parse: %d, %v", got, err)
+	}
+	if got, err := parsed.GetNotBeforeAt(); err != nil || got != notBeforeAt.Unix() {
+		t.Errorf("notBeforeAt after Parse: %d, %v", got, err)
+	}
+	if got, err := parsed.GetExpiresAt(); err != nil || got != expiresAt.Unix() {
+		t.Errorf("expiresAt after Parse: %d, %v", got, err)
+	}
+}
+
+// Only a list of strings is an audience. A single string stays an error, as scenario_test.go expects
+func TestAudienceInvalid(t *testing.T) {
+	values := map[string]any{
+		"string":          "Google",
+		"number":          5,
+		"null":            nil,
+		"list of numbers": []any{1, 2},
+		"mixed list":      []any{"Google", 1},
+		"list of lists":   []any{[]any{"Google"}},
+	}
+
+	for name, value := range values {
+		claims := New()
+		claims.Set(Audience, value)
+		audience, err := claims.GetAudience()
+		if err != ErrClaimValueInvalid || len(audience) != 0 {
+			t.Errorf("%s: got %v, %v, want an empty audience and ErrClaimValueInvalid", name, audience, err)
+		}
 	}
 }
 

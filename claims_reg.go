@@ -71,7 +71,8 @@ func (c Claims) SetAudience(audience []string) { c[Audience] = audience }
 // DeleteAudience deletes audience
 func (c Claims) DeleteAudience() { delete(c, Audience) }
 
-// GetAudience will get the audience set on the Claims
+// GetAudience will get the audience set on the Claims. The audience of claims that came out of Parse
+// is a list of values of any type, it counts when every one of them is a string
 func (c Claims) GetAudience() ([]string, error) {
 	if !c.Has(Audience) {
 		return []string{}, ErrNotFound
@@ -80,6 +81,18 @@ func (c Claims) GetAudience() ([]string, error) {
 	switch val := c[Audience].(type) {
 	case []string:
 		return val, nil
+	case []any:
+		audience := make([]string, len(val))
+		for i, item := range val {
+			str, ok := item.(string)
+			if !ok {
+				return []string{}, ErrClaimValueInvalid
+			}
+
+			audience[i] = str
+		}
+
+		return audience, nil
 	}
 
 	return []string{}, ErrClaimValueInvalid
